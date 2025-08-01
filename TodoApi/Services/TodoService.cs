@@ -37,6 +37,7 @@ namespace TodoApi.Services
             };
 
             await _repository.AddAsync(item);
+            await _repository.SaveChange();
             return _mapper.Map<TodoItemDTO>(item);
         }
 
@@ -48,6 +49,7 @@ namespace TodoApi.Services
             item.Name = dto.Name;
             item.IsComplete = dto.IsComplete;
             await _repository.UpdateAsync(item);
+            await _repository.SaveChange();
             return true;
         }
 
@@ -57,6 +59,7 @@ namespace TodoApi.Services
             if (item == null) return false;
 
             await _repository.DeleteAsync(item);
+            await _repository.SaveChange();
             return true;
         }
     }
