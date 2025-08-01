@@ -9,6 +9,7 @@ namespace TodoApi.Repositories
         Task AddAsync(TodoItem item);
         Task UpdateAsync(TodoItem item);
         Task DeleteAsync(TodoItem item);
+        Task SaveChange();
     }
 }
 

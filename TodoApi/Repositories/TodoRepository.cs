@@ -21,18 +21,23 @@ namespace TodoApi.Repositories
         public async Task AddAsync(TodoItem item)
         {
             _context.TodoItems.Add(item);
-            await _context.SaveChangesAsync();
+            await SaveChange();
         }
 
         public async Task UpdateAsync(TodoItem item)
         {
             _context.Entry(item).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            await SaveChange();
         }
 
         public async Task DeleteAsync(TodoItem item)
         {
             _context.TodoItems.Remove(item);
+            await SaveChange();
+        }
+
+        public async Task SaveChange()
+        {
             await _context.SaveChangesAsync();
         }
     }
