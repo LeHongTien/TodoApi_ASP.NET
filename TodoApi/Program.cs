@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using TodoApi.Contracts.Repositories;
+using TodoApi.Contracts.Services;
+using TodoApi.Data;
 using TodoApi.Mappings;
-using TodoApi.Models;
 using TodoApi.Repositories;
 using TodoApi.Services;
 
@@ -13,11 +15,9 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<TodoContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<ITodoService, TodoService>();
-builder.Services.AddScoped<ITodoRepository, TodoRepository>();
-builder.Services.AddAutoMapper(typeof(MappingProfile)); 
-
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

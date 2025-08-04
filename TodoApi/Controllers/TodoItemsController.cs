@@ -1,53 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TodoApi.Models;
-using TodoApi.Services;
+using TodoApi.Contracts.Services;
+using TodoApi.DTOs;
 
-namespace TodoApi.Controllers;
-
-[Route("api/[controller]")]
-[ApiController]
-public class TodoItemsController : ControllerBase
+namespace TodoApi.Controllers
 {
-    private readonly ITodoService _todoService;
-
-    public TodoItemsController(ITodoService todoService)
+    [ApiController]
+    [Route("api/todos")]
+    public class TodoItemsController : ControllerBase
     {
-        _todoService = todoService;
-    }
+        private readonly ITodoService _service;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
-    {
-        var items = await _todoService.GetAllAsync();
-        return Ok(items);
-    }
+        public TodoItemsController(ITodoService service)
+        {
+            _service = service;
+        }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
-    {
-        var item = await _todoService.GetByIdAsync(id);
-        if (item == null) return NotFound();
-        return Ok(item);
-    }
+        [HttpGet]
+        public async Task<IActionResult> GetAll() =>
+            Ok(await _service.GetAllAsync());
 
-    [HttpPost]
-    public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO dto)
-    {
-        var created = await _todoService.AddAsync(dto);
-        return CreatedAtAction(nameof(GetTodoItem), new { id = created!.Id }, created);
-    }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(long id)
+        {
+            var todo = await _service.GetByIdAsync(id);
+            return todo == null ? NotFound() : Ok(todo);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutTodoItem(long id, TodoItemDTO dto)
-    {
-        var result = await _todoService.UpdateAsync(id, dto);
-        return result ? NoContent() : NotFound();
-    }
+        [HttpPost]
+        public async Task<IActionResult> Create(TodoItemDTO dto)
+        {
+            var created = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(long id)
-    {
-        var result = await _todoService.DeleteAsync(id);
-        return result ? NoContent() : NotFound();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(long id, TodoItemDTO dto) =>
+            await _service.UpdateAsync(id, dto) ? NoContent() : NotFound();
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(long id) =>
+            await _service.DeleteAsync(id) ? NoContent() : NotFound();
     }
 }

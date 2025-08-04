@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using TodoApi.Models;
+using TodoApi.DTOs;
+using TodoApi.Entities;
 
 namespace TodoApi.Mappings
 {
@@ -7,8 +8,7 @@ namespace TodoApi.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<TodoItem, TodoItemDTO>();
-            CreateMap<TodoItemDTO, TodoItem>();
+            CreateMap<TodoItem, TodoItemDTO>().ReverseMap();
         }
     }
 }
