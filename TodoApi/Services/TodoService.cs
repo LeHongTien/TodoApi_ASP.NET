@@ -17,16 +17,19 @@ namespace TodoApi.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TodoItemDTO>> GetAllAsync()
+        public async Task<IEnumerable<TodoItemDTO>> GetAllAsync(long userId)
         {
-            var items = _repo.Todo.FindAll().ToList();
+            var items = _repo.Todo
+                .FindByCondition(t => t.UserId == userId)
+                .ToList();
             return _mapper.Map<IEnumerable<TodoItemDTO>>(items);
         }
 
-        public async Task<TodoItemDTO?> GetByIdAsync(long id)
+        public async Task<TodoItemDTO?> GetByIdAsync(long id, long userId)
         {
             var entity = await _repo.Todo.GetByIdAsync(id);
-            return entity == null ? null : _mapper.Map<TodoItemDTO>(entity);
+            if (entity == null || entity.UserId != userId) return null;
+            return _mapper.Map<TodoItemDTO>(entity);
         }
 
         public async Task<TodoItemDTO> CreateAsync(TodoItemDTO dto)
@@ -37,10 +40,10 @@ namespace TodoApi.Services
             return _mapper.Map<TodoItemDTO>(entity);
         }
 
-        public async Task<bool> UpdateAsync(long id, TodoItemDTO dto)
+        public async Task<bool> UpdateAsync(long id, TodoItemDTO dto, long userId)
         {
             var entity = await _repo.Todo.GetByIdAsync(id);
-            if (entity == null) return false;
+            if (entity == null || entity.UserId != userId) return false;
 
             _mapper.Map(dto, entity);
             _repo.Todo.Update(entity);
@@ -48,14 +51,21 @@ namespace TodoApi.Services
             return true;
         }
 
-        public async Task<bool> DeleteAsync(long id)
+        public async Task<bool> DeleteAsync(long id, long userId)
         {
             var entity = await _repo.Todo.GetByIdAsync(id);
-            if (entity == null) return false;
+            if (entity == null || entity.UserId != userId) return false;
 
             _repo.Todo.Delete(entity);
             await _repo.SaveAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Tag>> GetTagsByTodoIdAsync(long todoItemId)
+        {
+            var tags = await _repo.Todo.GetTagsByTodoIdAsync(todoItemId);
+            return tags ?? Enumerable.Empty<Tag>();
+        }
+
     }
 }

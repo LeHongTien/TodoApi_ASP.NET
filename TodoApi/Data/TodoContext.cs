@@ -8,6 +8,8 @@ namespace TodoApi.Data
         public TodoContext(DbContextOptions<TodoContext> options) : base(options) { }
 
         public DbSet<TodoItem> TodoItems => Set<TodoItem>();
+        public DbSet<User> Users { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -11,5 +11,12 @@ namespace TodoApi.Repositories
 
         public async Task<TodoItem?> GetByIdAsync(long id) =>
             await _context.TodoItems.FirstOrDefaultAsync(t => t.Id == id);
+
+        public async Task<IEnumerable<Tag>> GetTagsByTodoIdAsync(long todoItemId)
+        {
+            return await _context.Tags
+                .Where(t => t.TodoItems.Any(todo => todo.Id == todoItemId))
+                .ToListAsync();
+        }
     }
 }
